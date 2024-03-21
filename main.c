@@ -8,6 +8,7 @@ int tamanhoPizza(){
     printf("[1]-Médio\n");
     printf("[3]-Grande\n");
     printf("[4]-Fámilia\n");
+    printf("[5]-Fámilia\n");
     scanf("%i",&tam);
 
     return tam;
