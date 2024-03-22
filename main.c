@@ -10,6 +10,7 @@ int tamanhoPizza(){
     printf("[4]-Fámilia\n");
     printf("[5]-Fámilia\n");
     scanf("%i",&tam);
+    // ignore
 
     return tam;
 }
