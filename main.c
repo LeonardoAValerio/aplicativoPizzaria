@@ -1,22 +1,29 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+#define ARR_SAB 4
 
 int tamanhoPizza();
-int saboresPizza();
+int* saboresPizza();
 
 int main(){ //O Menu inicial 
     int option;
-    int *a[1][4];
+    int* arr;
     printf("Bem vindo a pizzaria Pizzas\n Oque Desejas?\n");
     printf("[1]Pedir uma pizza\n");
     printf("[2]Sair\n");
     scanf("%i",&option);
     if(option == 1){
-        a[0] = saboresPizza();
+        tamanhoPizza();
+        arr = saboresPizza();
+        
     }else{
         return 0;
     }
-    
-    return 0;
+    for(int i=0; i<4; i++){
+        printf("%i\n",arr[i]);
+    }
+return 0;
 }
 
 int tamanhoPizza(){ //Definindo o tamanho da pizza
@@ -30,8 +37,9 @@ int tamanhoPizza(){ //Definindo o tamanho da pizza
     return tam;
 }
 
-int saboresPizza(){ //Definindo os sabores da pizza
-    int *sab[1][4], quan;
+int* saboresPizza(){ //Definindo os sabores da pizza
+    int *sab = malloc(ARR_SAB*sizeof(int));
+    int quan;
     printf("Quantos sabores voce ira querer [1-4]:\n");
     scanf("%i",&quan);
     for(int i=0; i<quan; i++){
@@ -40,9 +48,7 @@ int saboresPizza(){ //Definindo os sabores da pizza
         printf("[2]Frango com catupiry\n");
         printf("[3]Marguerita\n");
         printf("[4]Baiana\n");
-        scanf("%i",&sab[0][i]);
+        scanf("%d",&sab[i]);
     }
-
-    printf("%i",sab[0][0]);
-    return sab[0];
+    return sab;
 }
