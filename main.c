@@ -6,8 +6,20 @@
 //#define PI 3.1416 
 //Sempre que escrever "PI" dentro do código, será convertido para o valor colocado 
 
+<<<<<<< HEAD
 int tamanhoPizza(); //Chamada da função
 int* saboresPizza(); //Chamada da função, ela tem um ponteiro, por conta que irá apontar uma localização na memória
+=======
+int tamanhoPizza(){
+    printf("Vamos escolher um tamanho para sua pizza!\n");
+    printf("[1]-Pequeno\n");
+    printf("[1]-Médio\n");
+    printf("[3]-Grande\n");
+    printf("[4]-Fámilia\n");
+    printf("[5]-Fámilia\n");
+    scanf("%i",&tam);
+    // ignore
+>>>>>>> develop
 
 int main(){ //O MENU INICIAL
     int option;
