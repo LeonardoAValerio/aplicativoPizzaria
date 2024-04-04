@@ -14,7 +14,7 @@ int* saboresPizza();
 void pedidosPizza(pizza*, int);
 
 int main(){
-    int option, currentSize, sizeMaxPizzaArr = 0;
+    int option, currentSize, sizeMaxArr = 0;
     int* arrFlavor;
     pizza* pizzaArr = malloc(sizeMaxArr * sizeof(pizza));
     do{
@@ -28,9 +28,9 @@ int main(){
         switch (option)
         {
         case 2:
-            sizeMaxPizzaArr++;
-            currentSize = sizeMaxPizzaArr-1;
-            pizzaArr = realloc(pizzaArr, sizeMaxPizzaArr * sizeof(pizza));
+            sizeMaxArr++;
+            currentSize = sizeMaxArr-1;
+            pizzaArr = realloc(pizzaArr, sizeMaxArr * sizeof(pizza));
             printf("Vamos montar uma pizza!\n");
             pizzaArr[currentSize].size = tamanhoPizza();
             arrFlavor = saboresPizza();
@@ -60,10 +60,11 @@ int tamanhoPizza(){
     int optionT = 1;
     do{
         printf("Escolha o tamanho da sua pizza!\n");
-        printf("\t[1] - Pequeno\n");
+        printf("\t[1] - Pequeno \n");
         printf("\t[2] - Medio\n");
         printf("\t[3] - Grande\n");
         printf("\t[4] - Familia\n");
+        printf("Digite o valor do tamanho da pizza: ");
         scanf("%d",&optionT);
         if(optionT < 0 || optionT > 4){
             printf("Opcao invalida!");
@@ -75,9 +76,32 @@ int tamanhoPizza(){
 
 int* saboresPizza(){
     int *flavorP = malloc(SIZE_MAX_FLAVORS * sizeof(int));
+    int quan, check = 1;
     for(int i = 0; i<SIZE_MAX_FLAVORS; i++){
-        flavorP[i] = 5;
+        flavorP[i] = 0;
     }
+    do{
+        printf("Informe quantos sabores deseja(1-4): ");
+        scanf("%d",&quan);
+        if(quan<1 || quan >4){
+            printf("Opcao invalida!\n");
+            check = 0;
+            continue;
+        }
+
+        printf("CARDAPIO DE SABORES:\n");
+        printf("\t[1] - Calabresa\n");
+        printf("\t[2] - Frango com Catupiry\n");
+        printf("\t[3] - Marguerita\n");
+        printf("\t[4] - 4 Queijos\n");
+        printf("\t[5] - Tomate Seco\n");
+        printf("\t[6] - Moda da Casa\n");
+        for(int i = 0; i<quan; i++){
+            printf("Digite o valor do seu %d sabor: ",i+1);
+            scanf("%d",&flavorP[i]);
+        }
+        check = 1;
+    }while(check == 0);
     return flavorP;
 }
 
