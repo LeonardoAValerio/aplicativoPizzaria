@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define SIZE_MAX_FLAVORS 4
+
 typedef struct{
     int size;
-    int* flavors;
+    int flavors[SIZE_MAX_FLAVORS];
     float price;
 }pizza;
 
@@ -12,8 +14,9 @@ int* saboresPizza();
 void pedidosPizza(pizza*, int);
 
 int main(){
-    int option, j, i = 0;
-    pizza* pizzaArr = malloc(i * sizeof(pizza));
+    int option, currentSize, sizeMaxPizzaArr = 0;
+    int* arrFlavor;
+    pizza* pizzaArr = malloc(sizeMaxArr * sizeof(pizza));
     do{
         system("cls");
         printf("Bem vindo a Pizzaria Galla!\n");
@@ -25,17 +28,19 @@ int main(){
         switch (option)
         {
         case 2:
-            i++;
-            j = i-1;
-            pizzaArr = realloc(pizzaArr, i * sizeof(pizza));
+            sizeMaxPizzaArr++;
+            currentSize = sizeMaxPizzaArr-1;
+            pizzaArr = realloc(pizzaArr, sizeMaxPizzaArr * sizeof(pizza));
             printf("Vamos montar uma pizza!\n");
-            printf("%d",j);
-            pizzaArr[j].size = tamanhoPizza();
-            pizzaArr[j].flavors = saboresPizza();
+            pizzaArr[currentSize].size = tamanhoPizza();
+            arrFlavor = saboresPizza();
+            for(int k = 0; k<SIZE_MAX_FLAVORS; k++){
+                pizzaArr[currentSize].flavors[k] = arrFlavor[k];
+            }
             continue;
         
         case 1:
-            pedidosPizza(pizzaArr, i);
+            pedidosPizza(pizzaArr, sizeMaxArr);
             continue;
 
         case 0:
@@ -69,11 +74,11 @@ int tamanhoPizza(){
 }
 
 int* saboresPizza(){
-    int* flavorP[4];
-    for(int i = 0; i>4; i++){
-        flavorP[i] = 0;
+    int *flavorP = malloc(SIZE_MAX_FLAVORS * sizeof(int));
+    for(int i = 0; i<SIZE_MAX_FLAVORS; i++){
+        flavorP[i] = 5;
     }
-    return *flavorP;
+    return flavorP;
 }
 
 void pedidosPizza(pizza* arr, int sizeArr){
@@ -83,6 +88,13 @@ void pedidosPizza(pizza* arr, int sizeArr){
         for(k = 0; k<sizeArr; k++){
             printf("\t[Pizza %d]:\n",k+1);
             printf("\tTamanho: %d\n",arr[k].size);
+            printf("\tSabores: \n");
+            for(int i = 0; i<SIZE_MAX_FLAVORS; i++){
+                int printFlavor = arr[k].flavors[i];
+                if(printFlavor != 0){
+                    printf("\t%d\n",printFlavor);
+                }
+            }  
         }
         if(k > 0){
             printf("\t[2] - Confirmar Pedido(s)\n");
