@@ -56,7 +56,7 @@ int main(){
                 pizzaArr[currentSize].flavors[k] = arrFlavor[k];
             }
             pizzaArr[currentSize].price = (float)pizzaArr[currentSize].size * PRICE_PIZZA;
-            continue;
+            break;
         case 1:
             pagamento = pedidosPizza(pizzaArr, sizeMaxArr);
             switch (pagamento)
@@ -76,14 +76,14 @@ int main(){
             default:
                 break;
             }
-            continue;
+            break;
         case 0:
             printf("Volte Sempre!\n");
-            continue;
+            break;
                     
         default:
             printf("Opcao invalida!\n");
-            continue;
+            break;
         }
     }while(option != 0);
     free(pizzaArr);
