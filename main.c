@@ -1,9 +1,3 @@
-/*
--Bebidas
--Preço Pizza
--Nota fiscal/Pagamento(Gabriel)
-*/
-
 #include <stdio.h>
 #include <windows.h>
 #include <string.h>
@@ -29,7 +23,7 @@ int tamanhoPizza();
 int* saboresPizza();
 int pedidosPizza(pizza*, int);
 registerPizza getRegister();
-void notafiscal(pizza*, int);
+void notafiscal(pizza*, int, registerPizza);
 
 int main(){
     int option, pagamento; //Variáveis de checkagem, como a da opção inicial e quando ele decidir pagar.
@@ -66,7 +60,8 @@ int main(){
             switch (pagamento){
             case 2: //Quandoele escolhe finalizar o pedido
                 registered = getRegister(); //Guarda na struct a função que retorna a struct que o usuário mudou
-                notafiscal(pizzaArr, sizeMaxArr); //chama o função que mostra nota fiscal final
+                notafiscal(pizzaArr, sizeMaxArr, registered); //chama o função que mostra nota fiscal final
+                option = 0; // para acabar o loop e fechar o código
                 break;
             case 1: //Quando ele escolhe limpar todos os pedidos
                 free(pizzaArr); //limpa a memória da alocação dinâmica
@@ -109,7 +104,7 @@ int tamanhoPizza(){ //Descobre o tamanho da pizza que o usuário quer
     return optionT; //retorna a opção selecionada para quem chamou
 }
 
-int* saboresPizza(){ //Descobre os sabores da pizza que o usuário quer
+int* saboresPizza(){ //Descobre os sabores da pizza que o usuário quer (Sendo essa função ponteira, pois retorna um valor ponteiro)
     int *flavorP = malloc(SIZE_MAX_FLAVORS * sizeof(int)); //cria uma alocação dinâmica para conseguir retornar um array em uma função
     int quan, check = 1;
     for(int i = 0; i<SIZE_MAX_FLAVORS; i++){ //inicia todos os valores em 0, para quando não tiver sabor
@@ -233,24 +228,34 @@ int pedidosPizza(pizza* order, int numOrder){ //Mostra os pedidos e as opções
     return 0;
 }
 
-registerPizza getRegister(){
-    registerPizza registration;
-    fflush(stdin);
+registerPizza getRegister(){ //cadastra o cliente (sendo essa função uma struct "registerPizza" pois retorna esse tipo de função)
+    registerPizza registration; //cria a estrutura que será retornada
+    fflush(stdin); //limpa os lixos que pode entrar no fgets
     printf("\tCadastro: \n");
     printf("Informe seu nome:\n");
-    fgets(registration.name, MAX_CHAR, stdin);
+    fgets(registration.name, MAX_CHAR, stdin); //Usa o fgets para alterar os valores na struct, sendo o nome, endereço e numero
     printf("Informe seu endereco:\n");
     fgets(registration.adress, MAX_CHAR, stdin);
     printf("Informe seu numero:\n");
     fgets(registration.number, MAX_CHAR, stdin);
-    return registration;
+    return registration; //retorna para quem chamou a estrutura feita de cadastramento
 }
 
-void notafiscal(pizza* pedidos, int maxPedidos){
-    //loop{
-    //printar o pedido (pedido 1)
-    //printar o tamanho dele
-    //printar o 4 sabores (considerando que o sabores que forem 0 não apareceram)
-    //printar o tamanho
-    //}
+void notafiscal(pizza* pedidos, int maxPedidos, registerPizza reg) {
+    printf("======= Nota Fiscal =======\n");
+    printf("Nome Registrado: %s", reg.name);
+    printf("Endereco Registrado: %s", reg.adress);
+    printf("Numero Registrado: %s", reg.number);
+    for(int i = 0; i < maxPedidos; i++) {
+        printf("Tamanho Da Pizza: %d\n", pedidos[i].size);
+        printf("Sabores:\n");
+        for(int j = 0; j < SIZE_MAX_FLAVORS; j++) {
+            if(pedidos[i].flavors[j] != 0) {
+                printf("%d\n", pedidos[i].flavors[j]);
+            } else {
+                break;
+            }
+        }
+        printf("Valor Total: R$%.2f\n", pedidos[i].price);
+    }
 }
