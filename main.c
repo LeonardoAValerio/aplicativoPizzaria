@@ -243,7 +243,7 @@ registerPizza getRegister(){ //cadastra o cliente (sendo essa função uma struc
 
 void notafiscal(pizza* pedidos, int maxPedidos, registerPizza reg) {
     printf("======= Nota Fiscal =======\n");
-    printf("Nome Registrado: %s", reg.name);
+    printf("Nome Registrado: %s", reg.name);S
     printf("Endereco Registrado: %s", reg.adress);
     printf("Numero Registrado: %s", reg.number);
     for(int i = 0; i < maxPedidos; i++) {
