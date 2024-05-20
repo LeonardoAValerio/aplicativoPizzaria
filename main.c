@@ -1,68 +1,53 @@
-//Imagine como se fosse um pedido no Mc'Donalds
-//Pedido - Fazer um pedido de cada vez, considerando que um Pedido pode ter infinitas pizzas!
-//Fazer o retorno dos sabores, tamanhos, em files! que servirá pra não precisar converter!
-//Cadastro - Guardar em Files, e poder verificar se ele cadastrou certo!
-//Selecionar a porção da pizza que o sabor irá ter!
-//Nota fiscal, !!FUNCIONAL!!
-//Adicionais/Montar sua pizza
-//Registro de quantos pedidos ele já fez em todo o aplicativo! (opcional)
-
 #include <stdio.h>
 #include <windows.h>
 #include <string.h>
 
-#define SIZE_MAX_FLAVORS 4 //O valor máximo de sabores, que pode ser de 1 - 4
-#define PRICE_PIZZA 24.75 //O preço da pizza é 24,75 x o tamanho
-#define MAX_CHAR 100 //O máximo de caracteres do cadastro
-
 typedef struct{ //A estrutura da pizza, que tem Tamanho, sabores e preço
-    char size[20];
-    char flavors[SIZE_MAX_FLAVORS][MAX_CHAR];
+    char size;
+    char flavors[4][20];
     float price;
 }pizza;
 
-typedef struct{ //A estrutura do cadastro, que tem o nome, o endereço e o numero dele
-    char name[MAX_CHAR];
-    char adress[MAX_CHAR];
-    char number[MAX_CHAR];
-}registerPizza;
-
 //Todas as funções declaradas antes
-void tamanhoPizza(); 
-void saboresPizza();
-
-//Variável file
-FILE* filePizza;
+void sizePricePizza(char**, float**);
+void flavorsPizza(char*);
 
 int main(){
     system("cls");
-    int option;
-    int currentSize, sizeMaxArr = 0; 
-    pizza* pizzaArr = malloc(sizeMaxArr * sizeof(pizza)); //O array de struct que usa alocação dinâmica de memória, para aumentar todo novo pedido
+    int option, quan;
+    printf("Bem vindo a Pizzaria Galla!\n");
     do{
-        printf("Bem vindo a Pizzaria Galla!\n");
-        printf("\t[2]-Novo Pedido\n");
-        printf("\t[1]-Verificar/Confirmar Pedidos\n");
+        printf("\tMENU\n");
+        printf("\t[1]-Novo Pedido\n");
         printf("\t[0]-Sair\n");
         printf("Digite oque deseja fazer: ");
-        scanf("%d",&option); 
+        scanf("%d",&option);
+        system("cls");
         switch (option){ //Verifica qual opção ele deseja
-        case 2: //Quando ele deseja uma nova pizza
-            sizeMaxArr++; //Acrescenta um pedido ao valor total de pedido
-            currentSize = sizeMaxArr-1; //Define qual será o pedido que será alterado na array
-            pizzaArr = realloc(pizzaArr, sizeMaxArr * sizeof(pizza)); //redimensiona o tamanho do array, sendo vezes o valor total de pedidos
-            printf("Vamos montar uma pizza!\n");
-            tamanhoPizza();
-            filePizza = fopen("size.txt", "r");
-            fgets(pizzaArr[currentSize].size, MAX_CHAR, filePizza);
-            fclose(filePizza);
-            saboresPizza();
-            
-            break;//Termina o pedido
-
-        case 1: //Quando ele deseja verificar os pedidos dele
-
+        case 1: //Quando ele deseja uma nova pizza
+            printf("Informe quantas pizzas serao feitas no pedido: ");
+            scanf("%d",&quan);
+            if(quan>0){ //Quando a quantidade de pizzas é maior que 0
+                pizza order[quan]; //cria as pizzas!
+                for(int i = 0; i<quan; i++){
+                    pizza* structOrder = &order[i]; //ponteiro que aponta a Struct atual
+                    char* size = &structOrder->size; //ponteiro que aponta o "tamanho" da struct
+                    float* price = &structOrder->price; //ponteiro que aponta o "preço" da struct
+                    char* flavors = structOrder->flavors[0]; //ponteiro que aponta os "preço" da struct
+                    //** guarda o endereço de memória de outro ponteiro
+                    printf("Vamos montar sua pizza n %d\n",i+1);
+                    sizePricePizza(&size, &price);//é enviado o endereçamento de memória do "tamanho" e do "preço" da struct
+                    flavorsPizza(flavors);
+                    for (int i = 0; i < 4; i++){
+                        printf("%s\n",structOrder->flavors[i]);
+                    }
+                    
+                }
+            }else{ //Quando a quantidade de pizzas é menor que 0 volta para o menu!
+                printf("Quantidade invalida!\nVoltando para o menu...\n");
+            }
             break;
+
         case 0: //Quando ele deseja sair
             printf("Volte Sempre!\n");
             break;
@@ -72,117 +57,56 @@ int main(){
             break;
         }
     }while(option != 0);
-    free(pizzaArr); //Limpa a memória dinâmica utilizada
     return 0;
 }
 
-void tamanhoPizza(){ //Descobre o tamanho da pizza que o usuário quer
-    int optionT; //opção do tamanhoPizza
-    filePizza = fopen("size.txt", "w");
+void sizePricePizza(char** size, float** price){ //Descobre o tamanho e preço da pizza que o usuário quer
+    int option; //opção do tamanhoPizza
     do{
+        option = 1;
         printf("Escolha o tamanho da sua pizza!\n");
-        printf("\t[1] - Pequeno \n");
-        printf("\t[2] - Medio\n");
-        printf("\t[3] - Grande\n");
-        printf("\t[4] - Familia\n");
+        printf("\t[1] - Pequeno - R$24.75\n");
+        printf("\t[2] - Medio   - R$49.50\n");
+        printf("\t[3] - Grande  - R$74.25\n");
+        printf("\t[4] - Familia - R$99.00\n");
         printf("Digite o valor do tamanho da pizza: ");
-        scanf("%d",&optionT); //verifica qual ele selecionou
-        switch (optionT)
+        scanf("%d",&option); //verifica qual ele selecionou
+        switch(option)
         {
         case 1:
-            fprintf(filePizza, "Pequeno");
+            strcpy(*size, "Pequeno");
+            **price = 24.75;
             break;
         
         case 2:
-            fprintf(filePizza, "Medio");
+            strcpy(*size, "Medio");
+            **price = 49.5;
             break;
 
         case 3:
-            fprintf(filePizza, "Grande");
+            strcpy(*size, "Pequeno");
+            **price = 74.25;
             break;
 
         case 4:
-            fprintf(filePizza, "Familia");
+            strcpy(*size, "Pequeno");
+            **price = 99;
             break;
         
         default:
             printf("Opcao inválida! insira novamente!\n");
-            optionT = 0;
+            option = 0;
             break;
         }
-    }while (optionT == 0);
-    fclose(filePizza);
+    }while (option == 0);
+    return;
 }
 
-void saboresPizza(){ //Descobre os sabores da pizza que o usuário quer (Sendo essa função ponteira, pois retorna um valor ponteiro)
-    int quan, check = 1;
-    int flavorP = 0;
-    do{
-        printf("Informe quantos sabores deseja(1-4): ");
-        scanf("%d",&quan); //verifica quantos sabores o usuário deseja
-        if(quan<1 || quan >4){ //checka se ele seleciona a quantidade entre 1-4, e se não ele fala pra ele repitir
-            printf("Opcao invalida!\n");
-            check = 0; 
-            continue; //pula o código e volta pra seleção de sabores
-        }
-        printf("CARDAPIO DE SABORES:\n");
-        printf("\t[1] - Calabresa\n");
-        printf("\t[2] - Frango com Catupiry\n");
-        printf("\t[3] - Portuguesa\n");
-        printf("\t[4] - Marguerita\n");
-        printf("\t[5] - Estrogonofe\n");
-        printf("\t[6] - Quatro queijos\n");
-        printf("\t[7] - Sensacao\n");
-        printf("\t[8] - Romeu e julieta\n");
-        for(int i = 0; i<quan; i++){
-            printf("Digite o valor do seu %d sabor: ",i+1);
-                scanf("%d",&flavorP);
-                if(i == 0){
-                    filePizza = fopen("flavor.txt", "w");
-                }else{
-                    filePizza = fopen("flavor.txt", "a");
-                }
-                switch (flavorP)
-                {
-                case 1:
-                    fprintf(filePizza, "Calabresa\n");
-                    break;
-
-                case 2:
-                    fprintf(filePizza, "Frango com Catupiry\n");
-                    break;
-
-                case 3:
-                    fprintf(filePizza, "Portuguesa\n");
-                    break;
-
-                case 4:
-                    fprintf(filePizza, "Marguerita\n");
-                    break;
-
-                case 5:
-                    fprintf(filePizza, "Estrogonofe\n");
-                    break;
-
-                case 6:
-                    fprintf(filePizza, "Quatro queijos\n");
-                    break;
-
-                case 7:
-                    fprintf(filePizza, "Sensação\n");
-                    break;
-
-                case 8:
-                    fprintf(filePizza, "Romeu e Julieta\n");
-                    break;
-                
-                default:
-                    printf("Opção invalida! tente novamente!\n");
-                    break;
-                }
-                fclose(filePizza);
-        }
-        check = 1; //faz o loop acabar
-    }while(check == 0);
+//ERRO AQUI!
+void flavorsPizza(char* flavors){
+    //int quan, check, flavor;
+    for(int i = 0; i<4; i++){
+        strcpy(flavors + i * 20, "0");
+    }
+    return;
 }
-
