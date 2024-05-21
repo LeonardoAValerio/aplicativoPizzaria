@@ -1,6 +1,1 @@
-/output
-main.exe
-.vscode/
-*.main.exe
-*.flavor.txt
-*.size.txt
+/output 
