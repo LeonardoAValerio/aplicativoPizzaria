@@ -1,122 +1,153 @@
 #include <stdio.h>
-#include <windows.h>
+#include <time.h>
+#include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
-#define SIZE_MAX_FLAVORS 4 //O valor máximo de sabores, que pode ser de 1 - 4
-#define PRICE_PIZZA 24.75 //O preço da pizza é 24,75 x o tamanho
-#define MAX_CHAR 100 //O máximo de caracteres do cadastro
+typedef struct {
+    char tamanho[20];
+    char sabores[4][20];
+    float preco;
+} pizza;
 
-typedef struct{ //A estrutura da pizza, que tem Tamanho, sabores e preço
-    int size;
-    int flavors[SIZE_MAX_FLAVORS];
-    float price;
-}pizza;
+void menu();
+void criaPedidos(pizza *pedido, int quanPizzas);
+void tamanhoPrecoPizza(char *tamanho, float *preco);
+void saboresPizza(char sabores[][20]);
+void notaFiscal(pizza *pedido, int quanPizzas);
 
-typedef struct{ //A estrutura do cadastro, que tem o nome, o endereço e o numero dele
-    char name[MAX_CHAR];
-    char adress[MAX_CHAR];
-    char number[MAX_CHAR];
-}registerPizza;
+int main() {
+    int continuar = 1;
+    int pizzas;
+    int confirm;
 
-//Todas as funções declaradas antes
-int tamanhoPizza(); 
-int* saboresPizza();
-int pedidosPizza(pizza*, int);
-registerPizza getRegister();
-void notafiscal(pizza*, int, registerPizza);
+    do {
+        menu();
+        scanf("%d", &continuar);
+        fflush(stdin); // Limpa o buffer de entrada para evitar problemas com o scanf
+        system("cls || clear");
 
-int main(){
-    int option, pagamento; //Variáveis de checkagem, como a da opção inicial e quando ele decidir pagar.
-    int currentSize, sizeMaxArr = 0; 
-    //currentSize: a posição do array dos pedidos que vou alterar / sizeMaxArr: o numero de pedidos totais
-    int* arrFlavor; //Variavel ponteira que ira receber a função ponteira
-    registerPizza registered; //A estrutura que recebe o cadastro do cliente da função
-    pizza* pizzaArr = malloc(sizeMaxArr * sizeof(pizza)); 
-    //O array de struct que usa alocação dinâmica de memória, para aumentar todo novo pedido
-    do{
-        system("cls");
-        printf("Bem vindo a Pizzaria Galla!\n");
-        printf("\t[2]-Novo Pedido\n");
-        printf("\t[1]-Verificar/Confirmar Pedidos\n");
-        printf("\t[0]-Sair\n");
-        printf("Digite oque deseja fazer: ");
-        scanf("%d",&option); 
-        switch (option){ //Verifica qual opção ele deseja
-        case 2: //Quando ele deseja uma nova pizza
-            sizeMaxArr++; //Acrescenta um pedido ao valor total de pedido
-            currentSize = sizeMaxArr-1; //Define qual será o pedido que será alterado na array
-            pizzaArr = realloc(pizzaArr, sizeMaxArr * sizeof(pizza)); //redimensiona o tamanho do array, sendo vezes o valor total de pedidos
-            printf("Vamos montar uma pizza!\n");
-            pizzaArr[currentSize].size = tamanhoPizza(); //no array atual, alteramos o tamanho da struct com a função tamanhoPizza(); 
-            arrFlavor = saboresPizza(); //Guardamos primeiro em um valor ponteiro todo o array devolvido com a função saboresPizza();
-            for(int k = 0; k<SIZE_MAX_FLAVORS; k++){ //Fazemos um loop para usar os valores recebidos da váriavel para trocar cada sabor da struct
-                pizzaArr[currentSize].flavors[k] = arrFlavor[k];
-            }
-            pizzaArr[currentSize].price = (float)pizzaArr[currentSize].size * PRICE_PIZZA; //Fazemos um cálculo simples para alterar o preço, com o tamanho*preçoPizza
-            break;//Termina o pedido
+        switch (continuar) {
+            case 1: // Deseja pedir
+                do {
+                    printf("Vamos aos pedidos!\n");
+                    printf("Escolha a quantidade de pizzas: \n");
+                    scanf("%d", &pizzas);
+                    fflush(stdin); // Limpa o buffer de entrada
 
-        case 1: //Quando ele deseja verificar os pedidos dele
-            pagamento = pedidosPizza(pizzaArr, sizeMaxArr); //mostra todos os pedidos e retorna a opção que ele escolheu
-            switch (pagamento){
-            case 2: //Quandoele escolhe finalizar o pedido
-                registered = getRegister(); //Guarda na struct a função que retorna a struct que o usuário mudou
-                notafiscal(pizzaArr, sizeMaxArr, registered); //chama o função que mostra nota fiscal final
-                option = 0; // para acabar o loop e fechar o código
+                    if (pizzas < 1) {
+                        printf("Escolha um valor valido\n");
+                        break;
+                    }
+
+                    printf("Voce escolheu %d pizzas. Esta correto? (1-Sim; 2-Nao)\n", pizzas);
+                    scanf("%d", &confirm);
+                    fflush(stdin); // Limpa o buffer de entrada
+
+                    if (confirm == 1) { // Pedido confirmado
+                        pizza pedido[pizzas];
+                        criaPedidos(pedido, pizzas); // Cria todos os pedidos
+                        notaFiscal(pedido, pizzas); // Chama a função para gerar a nota fiscal
+
+                    } else if (confirm == 2) { // Cliente deseja voltar
+                        printf("Voltando para o menu...\n");
+
+                    } else { // Opção invalida
+                        printf("Opcao invalida\n");
+                        confirm = 1;
+                    }
+
+                } while (confirm != 1);
                 break;
-            case 1: //Quando ele escolhe limpar todos os pedidos
-                free(pizzaArr); //limpa a memória da alocação dinâmica
-                currentSize = 0; //define que a posição do array agora é 0
-                sizeMaxArr = 0; //zera o valor de pedidos
-                pizzaArr = malloc(sizeMaxArr * sizeof(pizza)); //cria a array de structs novamente coms os valores zerados
+                
+            case 0: // Deseja fechar
+                printf("Volte sempre!");
                 break;
-            default: //Quando nenhua é escolhida, não acontece nada
-                break;
-            }
-            break;
-        case 0: //Quando ele deseja sair
-            printf("Volte Sempre!\n");
-            break;
-                    
-        default: //Quando ele digita um valor inválido
-            printf("Opcao invalida!\n");
-            break;
+
+            default:
+                printf("Digite uma opcao valida!\n");
         }
-    }while(option != 0);
-    free(pizzaArr); //Limpa a memória dinâmica utilizada
+    } while (continuar == 1);
+
     return 0;
 }
 
-int tamanhoPizza(){ //Descobre o tamanho da pizza que o usuário quer
-    int optionT; //opção do tamanhoPizza
-    do{
-        printf("Escolha o tamanho da sua pizza!\n");
-        printf("\t[1] - Pequeno \n");
-        printf("\t[2] - Medio\n");
-        printf("\t[3] - Grande\n");
-        printf("\t[4] - Familia\n");
-        printf("Digite o valor do tamanho da pizza: ");
-        scanf("%d",&optionT); //verifica qual ele selecionou
-        if(optionT < 0 || optionT > 4){ //se ele selecionou errado ele deixa a var igual a 0, loopando de novo
-            printf("Opcao invalida!\n");
-            optionT = 0;
-        }
-    }while (optionT == 0);
-    return optionT; //retorna a opção selecionada para quem chamou
+void menu() {
+    printf("Bem vindos a Pizzaria Galla's!\n");
+    printf("Vamos fazer um pedido?\n");
+    printf("[1] - Novo pedido\n");
+    printf("[0] - Sair\n");
 }
 
-int* saboresPizza(){ //Descobre os sabores da pizza que o usuário quer (Sendo essa função ponteira, pois retorna um valor ponteiro)
-    int *flavorP = malloc(SIZE_MAX_FLAVORS * sizeof(int)); //cria uma alocação dinâmica para conseguir retornar um array em uma função
-    int quan, check = 1;
-    for(int i = 0; i<SIZE_MAX_FLAVORS; i++){ //inicia todos os valores em 0, para quando não tiver sabor
-        flavorP[i] = 0;
+void criaPedidos(pizza *pedido, int quanPizzas) {
+    for (int i = 0; i < quanPizzas; i++) {
+        system("cls");
+        pizza *structPedido = &pedido[i]; // Ponteiro que aponta para a struct atual
+        printf("Vamos montar sua pizza n %d\n", i + 1);
+
+        tamanhoPrecoPizza(structPedido->tamanho, &structPedido->preco); // Passando diretamente o tamanho e o preço
+        saboresPizza(structPedido->sabores);
     }
-    do{
+}
+
+void tamanhoPrecoPizza(char *tamanho, float *preco) {
+    int flavor;
+    do {
+        flavor = 1;
+        printf("Escolha o tamanho da sua pizza!\n");
+        printf("\t[1] - Pequeno - R$24.75\n");
+        printf("\t[2] - Medio   - R$49.50\n");
+        printf("\t[3] - Grande  - R$74.25\n");
+        printf("\t[4] - Familia - R$99.00\n");
+        printf("Digite o valor do tamanho da pizza: ");
+        scanf("%d", &flavor); // Verifica qual ele selecionou
+        fflush(stdin); // Limpa o buffer de entrada
+
+        switch (flavor) {
+            case 1:
+                strcpy(tamanho, "Pequeno");
+                *preco = 24.75;
+                break;
+
+            case 2:
+                strcpy(tamanho, "Medio");
+                *preco = 49.5;
+                break;
+
+            case 3:
+                strcpy(tamanho, "Grande");
+                *preco = 74.25;
+                break;
+
+            case 4:
+                strcpy(tamanho, "Familia");
+                *preco = 99;
+                break;
+
+            default:
+                printf("Opcao inválida! insira novamente!\n");
+                flavor = 0;
+                break;
+        }
+    } while (flavor == 0);
+}
+
+void saboresPizza(char sabores[][20]) {
+    int quan, check, flavor;
+    for (int e = 0; e < 4; e++) {
+        strcpy(sabores[e], "0");
+    }
+    do {
+        check = 1;
+
         printf("Informe quantos sabores deseja(1-4): ");
-        scanf("%d",&quan); //verifica quantos sabores o usuário deseja
-        if(quan<1 || quan >4){ //checka se ele seleciona a quantidade entre 1-4, e se não ele fala pra ele repitir
+        scanf("%d", &quan); // Verifica quantos sabores o usuário deseja
+        fflush(stdin); // Limpa o buffer de entrada
+
+        if (quan < 1 || quan > 4) { // Checka se ele selecionou a quantidade entre 1-4, e se não ele fala pra ele repetir
             printf("Opcao invalida!\n");
             check = 0;
-            continue; //pula o código e volta pra seleção de sabores
+            continue; // Pula o código e volta para a seleção de sabores
         }
         printf("CARDAPIO DE SABORES:\n");
         printf("\t[1] - Calabresa\n");
@@ -127,135 +158,100 @@ int* saboresPizza(){ //Descobre os sabores da pizza que o usuário quer (Sendo e
         printf("\t[6] - Quatro queijos\n");
         printf("\t[7] - Sensacao\n");
         printf("\t[8] - Romeu e julieta\n");
-        for(int i = 0; i<quan; i++){//loop para trocar os valores do array com o valor do sabores
-            while(flavorP[i]<1 || flavorP[i]>8){ //while pra verificar se ele selecionou um sabor existente
-            printf("Digite o valor do seu %d sabor: ",i+1);
-                scanf("%d",&flavorP[i]); //troca o valor no array de sabores com valor escrito
-                if(flavorP[i]<1 || flavorP[i]>8){ 
-                    printf("Opcao invalida!\n");//se ele não seleciona um correto, ele avisa que foi inválido
-                }
+
+        for (int e = 0; e < quan; e++) {
+            printf("Digite o valor do seu %d sabor: ", e + 1);
+            scanf("%d", &flavor);
+            fflush(stdin); // Limpa o buffer de entrada
+
+            switch (flavor) {
+                case 1:
+                    strcpy(sabores[e], "Calabresa");
+                    break;
+
+                case 2:
+                    strcpy(sabores[e], "Frango com Catupiry");
+                    break;
+
+                case 3:
+                    strcpy(sabores[e], "Portuguesa");
+                    break;
+
+                case 4:
+                    strcpy(sabores[e], "Marguerita");
+                    break;
+
+                case 5:
+                    strcpy(sabores[e], "Estrogonofe");
+                    break;
+
+                case 6:
+                    strcpy(sabores[e], "Quatro queijos");
+                    break;
+
+                case 7:
+                    strcpy(sabores[e], "Sensacao");
+                    break;
+
+                case 8:
+                    strcpy(sabores[e], "Romeu e julieta");
+                    break;
+
+                default:
+                    printf("Opção invalida! tente novamente!\n");
+                    check = 0;
+                    break;
             }
         }
-        check = 1; //faz o loop acabar
-    }while(check == 0);
-    return flavorP; //retorna o array de sabores de alocação dinâmica
+    } while (check == 0);
 }
 
-int pedidosPizza(pizza* order, int numOrder){ //Mostra os pedidos e as opções
-    //order: struct de arrays / numOrder: valor total de pedidos
-    int confirm; //variavél de checkagem
-    do{
-    printf("\nSeus pedidos sao:\n");
-    for (int i = 0; i < numOrder; i++) { //faz um loop usando o valor total de pedidos
-        printf("Pedido %d:\n", i + 1);
-        char size[10]; //Faz uma variável pra mostrar o nome do tamanho
-        switch (order[i].size){ //Muda o nome "size" baseado no valor do tamanho da struct atual
-        case 4:
-            strcpy(size, "Familia"); //copia a string para dentro da variável
-            break;
-        
-        case 3:
-            strcpy(size, "Grande");
-            break;
-        
-        case 2:
-            strcpy(size, "Medio");
-            break;
+void notaFiscal(pizza *pedido, int quanPizzas) {
+    struct tm *data_hora_atual;
+    time_t segundos;
+    time(&segundos);
 
-        case 1:
-            strcpy(size, "Pequeno");
-            break;
-        default:
-            break;
-        }
-        printf("\tTamanho: %s\n", size); //printa o nome do size
-        for(int k = 0; k<SIZE_MAX_FLAVORS; k++){ //Faz um loop para conseguir printar os 4 sabores
-            char flavor[20]; //Uma variável pra mostrar o nome do sabor
-            switch (order[i].flavors[k]) //muda do nome "flavor" baseado no valor do sabor que está sendo testado no loop atual
-            {
-            case 1:
-                strcpy(flavor, "Calabresa");
-                break;
-            case 2:
-                strcpy(flavor, "Frango com Catupiry");
-                break;
-            case 3:
-                strcpy(flavor, "Portuguesa");
-                break;
-            case 4:
-                strcpy(flavor, "Marguerita");
-                break;
-            case 5:
-                strcpy(flavor, "Estrogonofe");
-                break;
-            case 6:
-                strcpy(flavor, "Quatro queijos");
-                break;
-            case 7:
-                strcpy(flavor, "Sensacao");
-                break;
-            case 8:
-                strcpy(flavor, "Romeu e Julieta");
-                break;
-            default:
-                break;
-            }
-            if(order[i].flavors[k] != 0){ //quando o sabor é igual a 0, ele não printa aquele sabor, pois não há sabor
-                printf("\tSabor %d: %s\n", k+1,flavor);
-            }
-        }
-        printf("\tPreco: R$%.2f\n", order[i].price);
-    }
-    printf("\n");
-    if(numOrder > 0){// Quando o numero de pizzas for maior que 1, ele mostra que ele pode confirmar ou cancelar o pedido
-            printf("\t[2] - Confirmar Pedido(s)\n");
-            printf("\t[1] - Cancelar Pedido(s)\n");
-        }
-        printf("\t[0] - Voltar\n");
-    scanf("%d", &confirm); //verifica a opção do usuário
+    data_hora_atual = localtime(&segundos);
 
-    if(confirm == 2 && numOrder>0){ //Quando ele confirmar o pedido e poder confirmar:
-        return 2; //retorna para a main, que usa esse valor
-    }else if(confirm == 1 && numOrder>0){ //Quando ele cancelar o pedido e poder cancelar
-        return 1; 
-    }else if(confirm == 0){ //Quando ele voltar para o menu
-        return 0; 
-    }else{
-        printf("Opcao invalida!\n");
+    FILE *arquivo;
+    arquivo = fopen("nota_fiscal.txt", "w");
+
+    if (arquivo == NULL) {
+        fprintf(stderr, "Erro ao abrir o arquivo.\n");
+        return;
     }
 
-    }while (confirm != 0);
-    return 0;
-}
+    fprintf(arquivo, "Data e Hora: %02d/%02d/%04d %02d:%02d:%02d\n\n",
+           data_hora_atual->tm_mday,
+           data_hora_atual->tm_mon + 1,
+           data_hora_atual->tm_year + 1900,
+           data_hora_atual->tm_hour,
+           data_hora_atual->tm_min,
+           data_hora_atual->tm_sec);
 
-registerPizza getRegister(){ //cadastra o cliente (sendo essa função uma struct "registerPizza" pois retorna esse tipo de função)
-    registerPizza registration; //cria a estrutura que será retornada
-    fflush(stdin); //limpa os lixos que pode entrar no fgets
-    printf("\tCadastro: \n");
-    printf("Informe seu nome:\n");
-    fgets(registration.name, MAX_CHAR, stdin); //Usa o fgets para alterar os valores na struct, sendo o nome, endereço e numero
-    printf("Informe seu endereco:\n");
-    fgets(registration.adress, MAX_CHAR, stdin);
-    printf("Informe seu numero:\n");
-    fgets(registration.number, MAX_CHAR, stdin);
-    return registration; //retorna para quem chamou a estrutura feita de cadastramento
-}
+    float totalGeral = 0.0;
 
-void notafiscal(pizza* pedidos, int maxPedidos, registerPizza reg) {
-    printf("======= Nota Fiscal =======\n");
-    printf("Nome Registrado: %s", reg.name);S
-    printf("Endereco Registrado: %s", reg.adress);
-    printf("Numero Registrado: %s", reg.number);
-    for(int i = 0; i < maxPedidos; i++) {
-        printf("Tamanho Da Pizza: %d\n", pedidos[i].size);
-        printf("Sabores:\n");
-        for(int j = 0; j < SIZE_MAX_FLAVORS; j++) {
-            if(pedidos[i].flavors[j] != 0) {
-                printf("%d\n", pedidos[i].flavors[j]);
-            } else {
-                break;
+    for (int e = 0; e < quanPizzas; e++) {
+
+        pizza *structPedido = &pedido[e];
+
+        fprintf(arquivo, "Pizza %d:\n", e + 1);
+        fprintf(arquivo, "Tamanho:\n %s\n\n", structPedido->tamanho);
+        fprintf(arquivo, "Sabores:\n");
+
+        for (int j = 0; j < 4; j++) {
+            if (strcmp(structPedido->sabores[j], "0") != 0)
+             {
+                fprintf(arquivo, "%s\n ", structPedido->sabores[j]);
             }
         }
-        printf("Valor Total: R$%.2f\n", pedidos[i].price);
+        fprintf(arquivo, "\nPreco: R$ %.2f\n\n", structPedido->preco);
+        totalGeral += structPedido->preco;
     }
+
+    fprintf(arquivo, "Valor Total: R$ %.2f\n", totalGeral);
+
+    fclose(arquivo);
+
+    printf("Pedido Feito com sucesso!! \n\n\n\n");
 }
