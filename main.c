@@ -3,64 +3,91 @@
 #include <string.h>
 
 typedef struct{ //A estrutura da pizza, que tem Tamanho, sabores e preço
-    char size;
-    char flavors[4][20];
-    float price;
+    char tamanho[20];
+    char sabores[4][20];
+    float preco;
 }pizza;
 
 //Todas as funções declaradas antes
-void sizePricePizza(char**, float**);
-void flavorsPizza(char*);
+void menu();
+void criaPedidos(pizza* pedido, int quanPizzas);
+void tamanhoPrecoPizza(char**, float**);
+void saboresPizza(char*);
 
-int main(){
-    system("cls");
-    int flavor, quan;
-    printf("Bem vindo a Pizzaria Galla!\n");
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int continuar = 1;
+    int pizzas;
+    int confirm;
     do{
-        printf("\tMENU\n");
-        printf("\t[1]-Novo Pedido\n");
-        printf("\t[0]-Sair\n");
-        printf("Digite oque deseja fazer: ");
-        scanf("%d",&flavor);
-        system("cls");
-        switch (flavor){ //Verifica qual opção ele deseja
-        case 1: //Quando ele deseja uma nova pizza
-            printf("Informe quantas pizzas serao feitas no pedido: ");
-            scanf("%d",&quan);
-            if(quan>0){ //Quando a quantidade de pizzas é maior que 0
-                pizza order[quan]; //cria as pizzas!
-                for(int i = 0; i<quan; i++){
-                    pizza* structOrder = &order[i]; //ponteiro que aponta a Struct atual
-                    char* size = &structOrder->size; //ponteiro que aponta o "tamanho" da struct
-                    float* price = &structOrder->price; //ponteiro que aponta o "preço" da struct
-                    char* flavors = structOrder->flavors[0]; //ponteiro que aponta os "preço" da struct
-                    //** guarda o endereço de memória de outro ponteiro
-                    printf("Vamos montar sua pizza n %d\n",i+1);
-                    sizePricePizza(&size, &price);//é enviado o endereçamento de memória do "tamanho" e do "preço" da struct
-                    flavorsPizza(flavors);
-                    for (int i = 0; i < 4; i++){
-                        printf("%s\n",structOrder->flavors[i]);
+        menu();
+        scanf("%d", &continuar);
+        system("cls || clear");
+        switch (continuar) {
+            case 1: //Deseja pedir
+                do{
+                    printf("Vamos aos pedidos!\n");
+                    printf("Escolha a quantidade de pizzas: \n");
+                    scanf("%d", &pizzas);
+                    if(pizzas<1){
+                        printf("Escolha um valor valido\n");
+                        break;
+                    }else{}
+                    printf("Voce escolheu %d pizzas. Esta correto? (1-Sim; 2-Nao)\n", pizzas);
+                    scanf("%d", &confirm);
+                    if(confirm == 1){ //Pedido confirmado
+                        pizza pedido[pizzas];
+                        criaPedidos(&pedido, pizzas); //Cria todos os pedidos
+                        //Confirma pedidos
+                        //Cadastra informações
+                        //Notafiscal
+                    }else if(confirm == 2){ //Cliente deseja voltare
+                        printf("Voltando para o menu...\n");
+                    }else{ //Opção invalida
+                        printf("Opcao invalida\n");
+                        confirm = 1;
                     }
-                    
-                }
-            }else{ //Quando a quantidade de pizzas é menor que 0 volta para o menu!
-                printf("Quantidade invalida!\nVoltando para o menu...\n");
-            }
-            break;
+                }while(confirm !=1);
+                break;
+            case 0: //Deseja fechar
+                printf("Volte sempre!");
+                break;
 
-        case 0: //Quando ele deseja sair
-            printf("Volte Sempre!\n");
-            break;
-                    
-        default: //Quando ele digita um valor inválido
-            printf("Opcao invalida!\n");
-            break;
-        }
-    }while(flavor != 0);
+            default:
+                printf("Digite uma opçao valida!\n");
+            }
+    }while(continuar == 1);
     return 0;
 }
 
-void sizePricePizza(char** size, float** price){ //Descobre o tamanho e preço da pizza que o usuário quer
+void menu(){
+    printf("Bem vindos a Pizzaria Galla's!\n");
+    printf("Vamos fazer um pedido?\n");
+    printf("[1] - Novo pedido\n");
+    printf("[0] - Sair\n");
+    return;
+}
+
+void criaPedidos(pizza* pedido, int quanPizzas){
+    for(int i = 0; i<quanPizzas; i++){
+        pizza* structPedido = &pedido[i]; //ponteiro que aponta a Struct atual
+        char* tamanho = structPedido->tamanho; //ponteiro que aponta o "tamanho" da struct
+        float* preco = &structPedido->preco; //ponteiro que aponta o "preço" da struct
+        char* sabores = structPedido->sabores[0]; //ponteiro que aponta os "preço" da struct
+        //** guarda o endereço de memória de outro ponteiro
+        printf("Vamos montar sua pizza n %d\n",i+1);
+        tamanhoPrecoPizza(&tamanho, &preco);//é enviado o endereçamento de memória do "tamanho" e do "preço" da struct
+        saboresPizza(sabores);
+        for (int i = 0; i < 4; i++){
+            printf("%s\n",structPedido->sabores[i]);
+        }
+    }
+    return;
+}
+
+void tamanhoPrecoPizza(char** tamanho, float** preco){ //Descobre o tamanho e preço da pizza que o usuário quer
     int flavor; //opção do tamanhoPizza
     do{
         flavor = 1;
@@ -74,23 +101,23 @@ void sizePricePizza(char** size, float** price){ //Descobre o tamanho e preço d
         switch(flavor)
         {
         case 1:
-            strcpy(*size, "Pequeno");
-            **price = 24.75;
+            strcpy(*tamanho, "Pequeno");
+            **preco = 24.75;
             break;
         
         case 2:
-            strcpy(*size, "Medio");
-            **price = 49.5;
+            strcpy(*tamanho, "Medio");
+            **preco = 49.5;
             break;
 
         case 3:
-            strcpy(*size, "Pequeno");
-            **price = 74.25;
+            strcpy(*tamanho, "Pequeno");
+            **preco = 74.25;
             break;
 
         case 4:
-            strcpy(*size, "Pequeno");
-            **price = 99;
+            strcpy(*tamanho, "Pequeno");
+            **preco = 99;
             break;
         
         default:
@@ -102,11 +129,10 @@ void sizePricePizza(char** size, float** price){ //Descobre o tamanho e preço d
     return;
 }
 
-//ERRO AQUI!
-void flavorsPizza(char* flavors){
+void saboresPizza(char* sabores){
     int quan, check, flavor;
     for(int i = 0; i<4; i++){
-        strcpy(flavors + i * 20, "0");
+        strcpy(sabores + i * 20, "0");
     }
     do{
         check = 1;
@@ -132,35 +158,35 @@ void flavorsPizza(char* flavors){
                 switch (flavor)
                 {
                 case 1:
-                    strcpy(flavors + i * 20, "Calabresa");
+                    strcpy(sabores + i * 20, "Calabresa");
                     break;
 
                 case 2:
-                    strcpy(flavors + i * 20, "Frango com Catupiry");
+                    strcpy(sabores + i * 20, "Frango com Catupiry");
                     break;
 
                 case 3:
-                    strcpy(flavors + i * 20, "Portuguesa");
+                    strcpy(sabores + i * 20, "Portuguesa");
                     break;
 
                 case 4:
-                    strcpy(flavors + i * 20, "Marguerita");
+                    strcpy(sabores + i * 20, "Marguerita");
                     break;
 
                 case 5:
-                    strcpy(flavors + i * 20, "Estrogonofe");
+                    strcpy(sabores + i * 20, "Estrogonofe");
                     break;
 
                 case 6:
-                    strcpy(flavors + i * 20, "Quatro queijos");
+                    strcpy(sabores + i * 20, "Quatro queijos");
                     break;
 
                 case 7:
-                    strcpy(flavors + i * 20, "Sensacao");
+                    strcpy(sabores + i * 20, "Sensacao");
                     break;
                 
                 case 8:
-                    strcpy(flavors + i * 20, "Romeu e julieta");
+                    strcpy(sabores + i * 20, "Romeu e julieta");
                     break;
                 
                 default:
