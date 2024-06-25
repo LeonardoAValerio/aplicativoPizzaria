@@ -15,21 +15,21 @@ void criaPedidos(pizza *pedido, int quanPizzas);
 void tamanhoPrecoPizza(char *tamanho, float *preco);
 void saboresPizza(char sabores[][20]);
 void notaFiscal(pizza *pedido, int quanPizzas);
+int checkPedido(pizza* pedido, int pizzas);
+void mostrarPedido(pizza* pedido, int quanPizzas);
+void alterarPedido(pizza* pedido, int quanPizzas);
 
 int main() {
     int continuar = 1;
     int pizzas;
     int confirm;
-
-    do {
+    do{
         menu();
         scanf("%d", &continuar);
         fflush(stdin); // Limpa o buffer de entrada para evitar problemas com o scanf
-        system("cls || clear");
-
         switch (continuar) {
             case 1: // Deseja pedir
-                do {
+                for(;;){
                     printf("Vamos aos pedidos!\n");
                     printf("Escolha a quantidade de pizzas: \n");
                     scanf("%d", &pizzas);
@@ -44,19 +44,22 @@ int main() {
                     scanf("%d", &confirm);
                     fflush(stdin); // Limpa o buffer de entrada
 
-                    if (confirm == 1) { // Pedido confirmado
+                    if(confirm == 1){ // Pedido confirmado
                         pizza pedido[pizzas];
                         criaPedidos(pedido, pizzas); // Cria todos os pedidos
-                        notaFiscal(pedido, pizzas); // Chama a função para gerar a nota fiscal
-
-                    } else if (confirm == 2) { // Cliente deseja voltar
+                        if(checkPedido(pedido, pizzas)){
+                            notaFiscal(pedido, pizzas); // Chama a função para gerar a nota fiscal
+                            continue;
+                        }else{
+                            break;
+                        }
+                    }else if (confirm == 2) { // Cliente deseja voltar
                         printf("Voltando para o menu...\n");
 
-                    } else { // Opção invalida
+                    }else { // Opção invalida1'1
                         printf("Opcao invalida\n");
                         confirm = 1;
                     }
-
                 } while (confirm != 1);
                 break;
                 
@@ -67,7 +70,8 @@ int main() {
             default:
                 printf("Digite uma opcao valida!\n");
         }
-    } while (continuar == 1);
+        
+    }while (continuar == 1);
 
     return 0;
 }
@@ -134,8 +138,8 @@ void tamanhoPrecoPizza(char *tamanho, float *preco) {
 
 void saboresPizza(char sabores[][20]) {
     int quan, check, flavor;
-    for (int e = 0; e < 4; e++) {
-        strcpy(sabores[e], "0");
+    for (int i = 0; i < 4; i++) {
+        strcpy(sabores[i], "0");
     }
     do {
         check = 1;
@@ -159,42 +163,42 @@ void saboresPizza(char sabores[][20]) {
         printf("\t[7] - Sensacao\n");
         printf("\t[8] - Romeu e julieta\n");
 
-        for (int e = 0; e < quan; e++) {
-            printf("Digite o valor do seu %d sabor: ", e + 1);
+        for (int i = 0; i < quan; i++) {
+            printf("Digite o valor do seu %d sabor: ", i + 1);
             scanf("%d", &flavor);
             fflush(stdin); // Limpa o buffer de entrada
 
             switch (flavor) {
                 case 1:
-                    strcpy(sabores[e], "Calabresa");
+                    strcpy(sabores[i], "Calabresa");
                     break;
 
                 case 2:
-                    strcpy(sabores[e], "Frango com Catupiry");
+                    strcpy(sabores[i], "Frango com Catupiry");
                     break;
 
                 case 3:
-                    strcpy(sabores[e], "Portuguesa");
+                    strcpy(sabores[i], "Portuguesa");
                     break;
 
                 case 4:
-                    strcpy(sabores[e], "Marguerita");
+                    strcpy(sabores[i], "Marguerita");
                     break;
 
                 case 5:
-                    strcpy(sabores[e], "Estrogonofe");
+                    strcpy(sabores[i], "Estrogonofe");
                     break;
 
                 case 6:
-                    strcpy(sabores[e], "Quatro queijos");
+                    strcpy(sabores[i], "Quatro queijos");
                     break;
 
                 case 7:
-                    strcpy(sabores[e], "Sensacao");
+                    strcpy(sabores[i], "Sensacao");
                     break;
 
                 case 8:
-                    strcpy(sabores[e], "Romeu e julieta");
+                    strcpy(sabores[i], "Romeu e julieta");
                     break;
 
                 default:
@@ -206,7 +210,87 @@ void saboresPizza(char sabores[][20]) {
     } while (check == 0);
 }
 
+int checkPedido(pizza* pedido, int pizzas){
+    int opcao, continuar;
+    do{
+        system("cls || clear");
+        mostrarPedido(pedido, pizzas);
+        printf("Opcoes:\n");
+        printf("[1] - Confirmar Pedido\n");
+        printf("[2] - Alterar Pedido\n");
+        printf("[3] - Cancelar Pedido\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+        fflush(stdin);
+        switch (opcao) {
+            case 1:
+            printf("Pedido confirmado!\n");
+            continuar = 0;
+            break;
+
+            case 2:
+            alterarPedido(pedido, pizzas);
+            break;
+
+            case 3:
+            printf("Pedido cancelado.\n");
+            continuar = 0;
+            break;
+
+            default:
+            printf("Opcao invalida! Tente novamente.\n");
+            break;
+        }
+    }while (opcao != 1 && opcao != 3);
+    return continuar;
+}
+
+void mostrarPedido(pizza* pedido, int quanPizzas) {
+    for (int i = 0; i < quanPizzas; i++) {
+        printf("\nPedido %d:\n", i + 1);
+        printf("Tamanho: %s\n", pedido[i].tamanho);
+        printf("Preco: %.2f\n", pedido[i].preco);
+        printf("Sabores:\n");
+        for (int j = 0; j < 4; j++) {
+            if (strcmp(pedido[i].sabores[j], "0") != 0) {
+                printf(" - %s\n", pedido[i].sabores[j]);
+            }
+        }
+    }
+}
+
+void alterarPedido(pizza* pedido, int quanPizzas) {
+    int pedidoNum, opcao;
+    printf("Qual pedido deseja alterar? (1-%d): ", quanPizzas);
+    scanf("%d", &pedidoNum);
+    if (pedidoNum < 1 || pedidoNum > quanPizzas) {
+        printf("Pedido invalido!\n");
+        return;
+    }
+    pizza* structPedido = &pedido[pedidoNum - 1];
+    do {
+        printf("O que deseja alterar?\n");
+        printf("[1] - Tamanho\n");
+        printf("[2] - Sabores\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+        switch (opcao) {
+            case 1:
+                tamanhoPrecoPizza(structPedido->tamanho, &(structPedido->preco));
+                break;
+            case 2:
+                saboresPizza(structPedido->sabores);
+                break;
+            default:
+                printf("Opcao invalida! Tente novamente.\n");
+                opcao = 0;
+                break;
+        }
+    } while (opcao == 0);
+}
+
 void notaFiscal(pizza *pedido, int quanPizzas) {
+    system("cls || clear");
     struct tm *data_hora_atual;
     time_t segundos;
     time(&segundos);
@@ -252,6 +336,7 @@ void notaFiscal(pizza *pedido, int quanPizzas) {
     fprintf(arquivo, "Valor Total: R$ %.2f\n", totalGeral);
 
     fclose(arquivo);
-
-    printf("Pedido Feito com sucesso!! \n\n\n\n");
+    system("cls || clear");
+    printf("Pedido Feito com sucesso!! \n\n\n\n\n");
+    return;
 }
