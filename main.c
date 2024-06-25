@@ -8,22 +8,31 @@ typedef struct {
     char tamanho[20];
     char sabores[4][20];
     float preco;
-} pizza;
+}pizza;
+
+typedef struct{
+    char nome[100];
+    char cpf[12];
+}cliente;
 
 void menu();
 void criaPedidos(pizza *pedido, int quanPizzas);
 void tamanhoPrecoPizza(char *tamanho, float *preco);
 void saboresPizza(char sabores[][20]);
-void notaFiscal(pizza *pedido, int quanPizzas);
 int checkPedido(pizza* pedido, int pizzas);
 void mostrarPedido(pizza* pedido, int quanPizzas);
 void alterarPedido(pizza* pedido, int quanPizzas);
+void criaCadastro(cliente* cadastro);
+int validaCPF(char *cpf);
+int validaNome(char *nome);
+void notaFiscal(pizza *pedido, int quanPizzas);
 
 int main() {
     int continuar = 1;
     int pizzas;
     int confirm;
     do{
+        system("cls || clear");
         menu();
         scanf("%d", &continuar);
         fflush(stdin); // Limpa o buffer de entrada para evitar problemas com o scanf
@@ -48,8 +57,10 @@ int main() {
                         pizza pedido[pizzas];
                         criaPedidos(pedido, pizzas); // Cria todos os pedidos
                         if(checkPedido(pedido, pizzas)){
+                            cliente cadastro;
+                            criaCadastro(&cadastro);
                             notaFiscal(pedido, pizzas); // Chama a função para gerar a nota fiscal
-                            continue;
+                            break;
                         }else{
                             break;
                         }
@@ -225,7 +236,7 @@ int checkPedido(pizza* pedido, int pizzas){
         switch (opcao) {
             case 1:
             printf("Pedido confirmado!\n");
-            continuar = 0;
+            continuar = 1;
             break;
 
             case 2:
@@ -289,6 +300,75 @@ void alterarPedido(pizza* pedido, int quanPizzas) {
     } while (opcao == 0);
 }
 
+void criaCadastro(cliente* cadastro){
+    do{
+        printf("Digite seu nome:\n");
+        fgets(cadastro->nome, 100, stdin);
+        fflush(stdin);
+        if(!(validaNome(cadastro->nome))){
+            printf("Digite um NOME valido\n");
+        }
+    }while(!(validaNome(cadastro->nome)));
+    do{
+        printf("Digite seu cpf:\n");
+        fgets(cadastro->cpf, 12, stdin);
+        fflush(stdin);
+        if(!(validaCPF(cadastro->cpf))){
+            printf("Digite um CPF valido\n");
+        }
+    }while(!(validaCPF(cadastro->cpf)));
+    return;
+}
+
+int validaNome(char *nome){
+    for(int i=0; i<(int)strlen(nome); i++){
+        if(nome[i] >= 'a' && nome[i] <= 'z'){
+                return 1;
+        }
+    }
+    return 0;
+}
+
+int validaCPF(char *cpf){
+    int i, j, digito1 = 0, digito2 = 0;
+    if(strlen(cpf)!=11){
+        return 0;
+    }
+    else{
+        for(i = 0, j = 10; i < (int)strlen(cpf)-2; i++, j--){ ///multiplica os números de 10 a 2 e soma os resultados dentro de digito1
+            digito1 += (cpf[i]-48) * j;
+        }
+        digito1 %= 11;
+        if(digito1 < 2){
+            digito1 = 0;
+        }
+        else{
+            digito1 = 11 - digito1;
+        }
+        if((cpf[9]-48) != digito1){
+            return 0;
+        }
+        ///se o digito 1 não for o mesmo que o da validação CPF é inválido
+        ///digito 2--------------------------------------------------
+        else{
+            for(i = 0, j = 11; i < (int)strlen(cpf)-1; i++, j--){ ///multiplica os números de 11 a 2 e soma os resultados dentro de digito2
+                    digito2 += (cpf[i]-48) * j;
+            }
+            digito2 %= 11;
+            if(digito2 < 2){
+                digito2 = 0;
+            }
+            else{
+                digito2 = 11 - digito2;
+            }
+            if((cpf[10]-48) != digito2){
+                return 0;
+            }///se o digito 2 não for o mesmo que o da validação CPF é inválido
+        }
+    }
+    return 1;
+}
+
 void notaFiscal(pizza *pedido, int quanPizzas) {
     system("cls || clear");
     struct tm *data_hora_atual;
@@ -337,6 +417,7 @@ void notaFiscal(pizza *pedido, int quanPizzas) {
 
     fclose(arquivo);
     system("cls || clear");
-    printf("Pedido Feito com sucesso!! \n\n\n\n\n");
+    printf("Pedido Feito com sucesso!!\nPressione Enter para seguir...\n");
+    getchar();//Espera o enter pra seguir
     return;
 }
