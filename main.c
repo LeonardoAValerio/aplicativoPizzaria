@@ -39,6 +39,7 @@ int main() {
         switch (continuar) {
             case 1: // Deseja pedir
                 for(;;){
+                    system("cls || clear");
                     printf("Vamos aos pedidos!\n");
                     printf("Escolha a quantidade de pizzas: \n");
                     scanf("%d", &pizzas);
@@ -301,6 +302,8 @@ void alterarPedido(pizza* pedido, int quanPizzas) {
 }
 
 void criaCadastro(cliente* cadastro){
+    system("cls || clear");
+    printf("Vamos fazer seu cadastro:\n");
     do{
         printf("Digite seu nome:\n");
         fgets(cadastro->nome, 100, stdin);
