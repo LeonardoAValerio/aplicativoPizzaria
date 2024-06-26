@@ -72,7 +72,7 @@ int main() {
                         printf("Opcao invalida\n");
                         confirm = 1;
                     }
-                } while (confirm != 1);
+                }
                 break;
                 
             case 0: // Deseja fechar
