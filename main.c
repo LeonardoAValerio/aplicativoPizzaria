@@ -84,7 +84,6 @@ int main() {
         }
         
     }while (continuar == 1);
-
     return 0;
 }
 
@@ -273,6 +272,7 @@ void mostrarPedido(pizza* pedido, int quanPizzas) {
 
 void alterarPedido(pizza* pedido, int quanPizzas) {
     int pedidoNum, opcao;
+    system("cls || clear");
     printf("Qual pedido deseja alterar? (1-%d): ", quanPizzas);
     scanf("%d", &pedidoNum);
     if (pedidoNum < 1 || pedidoNum > quanPizzas) {
