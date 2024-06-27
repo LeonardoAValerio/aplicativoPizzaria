@@ -25,31 +25,28 @@ void alterarPedido(pizza* pedido, int quanPizzas);
 void criaCadastro(cliente* cadastro);
 int validaCPF(char *cpf);
 int validaNome(char *nome);
-void notaFiscal(pizza *pedido, int quanPizzas);
+void notaFiscal(pizza *pedido, int quanPizzas, cliente *cadastro);
 
 int main() {
     int continuar = 1;
     int pizzas;
     int confirm;
-    do{
-        system("cls || clear");
+    for(;;){
         menu();
         scanf("%d", &continuar);
         fflush(stdin); // Limpa o buffer de entrada para evitar problemas com o scanf
         switch (continuar) {
             case 1: // Deseja pedir
-                for(;;){
+                do{
                     system("cls || clear");
                     printf("Vamos aos pedidos!\n");
                     printf("Escolha a quantidade de pizzas: \n");
                     scanf("%d", &pizzas);
                     fflush(stdin); // Limpa o buffer de entrada
-
                     if (pizzas < 1) {
                         printf("Escolha um valor valido\n");
-                        break;
+                        continue;
                     }
-
                     printf("Voce escolheu %d pizzas. Esta correto? (1-Sim; 2-Nao)\n", pizzas);
                     scanf("%d", &confirm);
                     fflush(stdin); // Limpa o buffer de entrada
@@ -60,25 +57,22 @@ int main() {
                         if(checkPedido(pedido, pizzas)){
                             cliente cadastro;
                             criaCadastro(&cadastro);
-                            notaFiscal(pedido, pizzas); // Chama a função para gerar a nota fiscal
-                            break;
-                        }else{
+                            notaFiscal(pedido, pizzas, &cadastro); // Chama a função para gerar a nota fiscal
                             break;
                         }
                     }else if (confirm == 2) { // Cliente deseja voltar
                         printf("Voltando para o menu...\n");
-
+                        confirm = 1;
                     }else { // Opção invalida1'1
                         printf("Opcao invalida\n");
                         confirm = 1;
                     }
                 } while (confirm != 1);
                 break;
-                
             case 0: // Deseja fechar
                 printf("Volte sempre!");
+                continuar = 0;
                 break;
-
             default:
                 printf("Digite uma opcao valida!\n");
         }
@@ -101,7 +95,7 @@ void criaPedidos(pizza *pedido, int quanPizzas) {
         printf("Vamos montar sua pizza n %d\n", i + 1);
 
         tamanhoPrecoPizza(structPedido->tamanho, &structPedido->preco); // Passando diretamente o tamanho e o preço
-        saboresPizza(structPedido->sabores);
+        saboresPizza(structPedido->sabores); //Passa diretamente os sabores
     }
 }
 
@@ -120,8 +114,8 @@ void tamanhoPrecoPizza(char *tamanho, float *preco) {
 
         switch (flavor) {
             case 1:
-                strcpy(tamanho, "Pequeno");
-                *preco = 24.75;
+                strcpy(tamanho, "Pequeno"); //Copia o tamanho pro vetor da struct
+                *preco = 24.75; //Copia o valor pra struct
                 break;
 
             case 2:
@@ -149,7 +143,7 @@ void tamanhoPrecoPizza(char *tamanho, float *preco) {
 
 void saboresPizza(char sabores[][20]) {
     int quan, check, flavor;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) { //Inicializa todos os valores
         strcpy(sabores[i], "0");
     }
     do {
@@ -175,13 +169,14 @@ void saboresPizza(char sabores[][20]) {
         printf("\t[8] - Romeu e julieta\n");
 
         for (int i = 0; i < quan; i++) {
+            check = 1;
             printf("Digite o valor do seu %d sabor: ", i + 1);
             scanf("%d", &flavor);
             fflush(stdin); // Limpa o buffer de entrada
 
             switch (flavor) {
                 case 1:
-                    strcpy(sabores[i], "Calabresa");
+                    strcpy(sabores[i], "Calabresa");//Copia pra linha que você deseja alterar
                     break;
 
                 case 2:
@@ -214,6 +209,7 @@ void saboresPizza(char sabores[][20]) {
 
                 default:
                     printf("Opção invalida! tente novamente!\n");
+                    i--;
                     check = 0;
                     break;
             }
@@ -225,7 +221,7 @@ int checkPedido(pizza* pedido, int pizzas){
     int opcao, continuar;
     do{
         system("cls || clear");
-        mostrarPedido(pedido, pizzas);
+        mostrarPedido(pedido, pizzas); //Printa todos os pedidos
         printf("Opcoes:\n");
         printf("[1] - Confirmar Pedido\n");
         printf("[2] - Alterar Pedido\n");
@@ -272,14 +268,13 @@ void mostrarPedido(pizza* pedido, int quanPizzas) {
 
 void alterarPedido(pizza* pedido, int quanPizzas) {
     int pedidoNum, opcao;
-    system("cls || clear");
     printf("Qual pedido deseja alterar? (1-%d): ", quanPizzas);
     scanf("%d", &pedidoNum);
-    if (pedidoNum < 1 || pedidoNum > quanPizzas) {
+    if (pedidoNum < 1 || pedidoNum > quanPizzas) { //Se seleciona um valor que não existe não permite
         printf("Pedido invalido!\n");
         return;
     }
-    pizza* structPedido = &pedido[pedidoNum - 1];
+    pizza* structPedido = &pedido[pedidoNum - 1]; //Manda a struct selecionada
     do {
         printf("O que deseja alterar?\n");
         printf("[1] - Tamanho\n");
@@ -288,7 +283,7 @@ void alterarPedido(pizza* pedido, int quanPizzas) {
         scanf("%d", &opcao);
         switch (opcao) {
             case 1:
-                tamanhoPrecoPizza(structPedido->tamanho, &(structPedido->preco));
+                tamanhoPrecoPizza(structPedido->tamanho, &(structPedido->preco)); //Remanda pras funções de fazer os pedidos
                 break;
             case 2:
                 saboresPizza(structPedido->sabores);
@@ -301,7 +296,7 @@ void alterarPedido(pizza* pedido, int quanPizzas) {
     } while (opcao == 0);
 }
 
-void criaCadastro(cliente* cadastro){
+void criaCadastro(cliente* cadastro){ //Cria o cadastro da compra
     system("cls || clear");
     printf("Vamos fazer seu cadastro:\n");
     do{
@@ -311,7 +306,7 @@ void criaCadastro(cliente* cadastro){
         if(!(validaNome(cadastro->nome))){
             printf("Digite um NOME valido\n");
         }
-    }while(!(validaNome(cadastro->nome)));
+    }while(!(validaNome(cadastro->nome))); //Enquanto o nome não for valido ele não sai
     do{
         printf("Digite seu cpf:\n");
         fgets(cadastro->cpf, 12, stdin);
@@ -319,20 +314,20 @@ void criaCadastro(cliente* cadastro){
         if(!(validaCPF(cadastro->cpf))){
             printf("Digite um CPF valido\n");
         }
-    }while(!(validaCPF(cadastro->cpf)));
+    }while(!(validaCPF(cadastro->cpf))); //Enquanto o cpf não for valido não vai
     return;
 }
 
 int validaNome(char *nome){
     for(int i=0; i<(int)strlen(nome); i++){
-        if(nome[i] >= 'a' && nome[i] <= 'z'){
+        if(nome[i] >= 'a' && nome[i] <= 'z'){ //verifica se tá entre A a Z
                 return 1;
         }
     }
     return 0;
 }
 
-int validaCPF(char *cpf){
+int validaCPF(char *cpf){ //Valida o CPF com os cálculos malucos
     int i, j, digito1 = 0, digito2 = 0;
     if(strlen(cpf)!=11){
         return 0;
@@ -372,55 +367,70 @@ int validaCPF(char *cpf){
     return 1;
 }
 
-void notaFiscal(pizza *pedido, int quanPizzas) {
+void notaFiscal(pizza *pedido, int quanPizzas, cliente *cadastro) {
     system("cls || clear");
+
     struct tm *data_hora_atual;
-    time_t segundos;
-    time(&segundos);
+    time_t segundos; //representa o horario em segundos
+    time(&segundos); //obtem o horario atual em segundos
 
     data_hora_atual = localtime(&segundos);
 
     FILE *arquivo;
-    arquivo = fopen("nota_fiscal.txt", "w");
+    arquivo = fopen("nota_fiscal.txt", "w"); //abre um arquivo
 
     if (arquivo == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo.\n");
+        fprintf(stderr, "Erro ao abrir o arquivo.\n"); //caso não puder ser aberto
         return;
     }
 
-    fprintf(arquivo, "Data e Hora: %02d/%02d/%04d %02d:%02d:%02d\n\n",
-           data_hora_atual->tm_mday,
-           data_hora_atual->tm_mon + 1,
-           data_hora_atual->tm_year + 1900,
-           data_hora_atual->tm_hour,
-           data_hora_atual->tm_min,
-           data_hora_atual->tm_sec);
+    // Imprime cabeçalho da nota fiscal
+    fprintf(arquivo, "---------------------------------------------\n");
+    fprintf(arquivo, "           NOTA FISCAL - Pizzaria Galla's\n");
+    fprintf(arquivo, "---------------------------------------------\n");
+    fprintf(arquivo, "Data e Hora do pedido: %02d/%02d/%04d %02d:%02d:%02d\n\n",
+           data_hora_atual->tm_mday, //dia
+           data_hora_atual->tm_mon + 1, //mes
+           data_hora_atual->tm_year + 1900, //ano
+           data_hora_atual->tm_hour, //hora
+           data_hora_atual->tm_min, //minuto
+           data_hora_atual->tm_sec); //segundos
 
-    float totalGeral = 0.0;
+    // Imprime  as informações do cliente
+    fprintf(arquivo, "Cliente:\n");
+    fprintf(arquivo, "Nome cadastrado: %s", cadastro->nome);
+    fprintf(arquivo, "Cpf cadastrado: %s\n\n", cadastro->cpf);
+
+    // Imprime os detalhes das pizzas pedidas
+    fprintf(arquivo, "Pedido:\n");
+    float valorTotal = 0.0; //acumula os o preço de todas as pizzas
 
     for (int e = 0; e < quanPizzas; e++) {
-
         pizza *structPedido = &pedido[e];
 
+        fprintf(arquivo, "---------------------------------------------\n");
         fprintf(arquivo, "Pizza %d:\n", e + 1);
-        fprintf(arquivo, "Tamanho:\n %s\n\n", structPedido->tamanho);
+        fprintf(arquivo, "Tamanho: %s\n", structPedido->tamanho);
         fprintf(arquivo, "Sabores:\n");
 
         for (int j = 0; j < 4; j++) {
-            if (strcmp(structPedido->sabores[j], "0") != 0)
-             {
-                fprintf(arquivo, "%s\n ", structPedido->sabores[j]);
+            if (strcmp(structPedido->sabores[j], "0") != 0) {
+                fprintf(arquivo, " - %s\n", structPedido->sabores[j]);
             }
         }
-        fprintf(arquivo, "\nPreco: R$ %.2f\n\n", structPedido->preco);
-        totalGeral += structPedido->preco;
+
+        fprintf(arquivo, "Preco: R$ %.2f\n", structPedido->preco);
+        valorTotal += structPedido->preco; //soma o valor das pizzas de forma individual
     }
 
-    fprintf(arquivo, "Valor Total: R$ %.2f\n", totalGeral);
+    fprintf(arquivo, "---------------------------------------------\n");
+    fprintf(arquivo, "Valor Total: R$ %.2f\n", valorTotal);
+    fprintf(arquivo, "---------------------------------------------\n");
 
-    fclose(arquivo);
+    fclose(arquivo); //Nada apos isso sera printado no TXT
     system("cls || clear");
-    printf("Pedido Feito com sucesso!!\nPressione Enter para seguir...\n");
-    getchar();//Espera o enter pra seguir
+    printf("Pedido Feito com sucesso!!\nPressione Enter para continuar...\n");
+    getchar(); // Espera o enter para continuar
+    system("cls || clear");
     return;
 }
